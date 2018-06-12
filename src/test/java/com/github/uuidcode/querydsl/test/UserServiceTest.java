@@ -101,10 +101,10 @@ public class UserServiceTest extends CoreTest {
     }
 
     @Test
-    public void set() {
+    public void join() {
         List<User> list = this.userService.list();
-        this.userAuthorityService.set(list);
-        this.bookService.set(list);
+        this.userAuthorityService.join(list);
+        this.bookService.join(list);
         CoreUtil.printJson(logger, list);
     }
 }

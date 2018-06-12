@@ -22,7 +22,7 @@ public class BookService extends EntityService<Book> {
             .fetch();
     }
 
-    public void set(List<User> userList)  {
+    public void join(List<User> userList)  {
         if (userList == null) {
             return;
         }
@@ -40,13 +40,12 @@ public class BookService extends EntityService<Book> {
             .where(QBook.book.userId.in(idList))
             .fetch();
 
-        bookList
-            .forEach(book -> {
-                User user = userMap.get(book.getUserId());
+        bookList.forEach(book -> {
+            User user = userMap.get(book.getUserId());
 
-                if (user != null) {
-                    user.addBook(book);
-                }
-            });
+            if (user != null) {
+                user.addBook(book);
+            }
+        });
     }
 }

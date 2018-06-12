@@ -21,7 +21,7 @@ public class UserAuthorityService extends EntityService<UserAuthority> {
             .fetch();
     }
 
-    public void set(List<User> userList)  {
+    public void join(List<User> userList)  {
         if (userList == null) {
             return;
         }
@@ -39,13 +39,12 @@ public class UserAuthorityService extends EntityService<UserAuthority> {
             .where(QUserAuthority.userAuthority.userId.in(userIdList))
             .fetch();
 
-        userAuthorityList
-            .forEach(userAuthority -> {
-                User user = userMap.get(userAuthority.getUserId());
+        userAuthorityList.forEach(userAuthority -> {
+            User user = userMap.get(userAuthority.getUserId());
 
-                if (user != null) {
-                    user.addUserAuthority(userAuthority);
-                }
-            });
+            if (user != null) {
+                user.addUserAuthority(userAuthority);
+            }
+        });
     }
 }
