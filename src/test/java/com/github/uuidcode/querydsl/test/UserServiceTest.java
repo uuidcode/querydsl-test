@@ -117,8 +117,9 @@ public class UserServiceTest extends CoreTest {
             .stream()
             .map(user -> {
                 List<UserAuthority> userAuthorityList = this.userAuthorityService.list(user.getUserId());
-                List<Book> bookList = this.bookService.list(user.getUserId());
                 user.setUserAuthorityList(userAuthorityList);
+
+                List<Book> bookList = this.bookService.list(user.getUserId());
                 user.setBookList(bookList);
                 return user;
             })
