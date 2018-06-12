@@ -29,8 +29,8 @@ public class UserAuthorityService extends EntityService<UserAuthority> {
         Map<Long, User> userMap = userList.stream()
             .collect(Collectors.toMap(User::getUserId, Function.identity()));
 
-        List<Long> userIdList = userMap.keySet()
-            .stream()
+        List<Long> userIdList = userList.stream()
+            .map(User::getUserId)
             .collect(Collectors.toList());
 
         List<UserAuthority> userAuthorityList = this.createQuery()
