@@ -1,13 +1,16 @@
 package com.github.uuidcode.querydsl.test;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.github.uuidcode.querydsl.test.entity.Book;
 import com.github.uuidcode.querydsl.test.entity.User;
+import com.github.uuidcode.querydsl.test.entity.UserAuthority;
 import com.github.uuidcode.querydsl.test.service.BookService;
 import com.github.uuidcode.querydsl.test.service.UserAuthorityService;
 import com.github.uuidcode.querydsl.test.service.UserService;
@@ -106,5 +109,23 @@ public class UserServiceTest extends CoreTest {
         this.userAuthorityService.join(list);
         this.bookService.join(list);
         CoreUtil.printJson(logger, list);
+    }
+
+    @Test
+    public void join2() {
+        List<User> userList = this.userService.list()
+            .stream()
+            .map(user -> {
+                List<UserAuthority> userAuthorityList = this.userAuthorityService.list(user.getUserId());
+                List<Book> bookList = this.bookService.list(user.getUserId());
+                user.setUserAuthorityList(userAuthorityList);
+                user.setBookList(bookList);
+                return user;
+            })
+            .collect(Collectors.toList());
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> join2 userList: {}", CoreUtil.toJson(userList));
+        }
     }
 }

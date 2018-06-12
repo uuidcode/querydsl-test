@@ -10,11 +10,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.uuidcode.querydsl.test.entity.Book;
 import com.github.uuidcode.querydsl.test.entity.QBook;
+import com.github.uuidcode.querydsl.test.entity.QUserAuthority;
 import com.github.uuidcode.querydsl.test.entity.User;
+import com.github.uuidcode.querydsl.test.entity.UserAuthority;
 
 @Service
 @Transactional
 public class BookService extends EntityService<Book> {
+    public List<Book> list(Long userId) {
+        return this.createQuery()
+            .select(QBook.book)
+            .from(QBook.book)
+            .where(QBook.book.userId.eq(userId))
+            .fetch();
+    }
+
     public List<Book> listAll() {
         return this.createQuery()
             .select(QBook.book)
