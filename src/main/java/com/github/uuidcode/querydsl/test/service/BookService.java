@@ -10,9 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.github.uuidcode.querydsl.test.entity.Book;
 import com.github.uuidcode.querydsl.test.entity.QBook;
-import com.github.uuidcode.querydsl.test.entity.QUserAuthority;
 import com.github.uuidcode.querydsl.test.entity.User;
-import com.github.uuidcode.querydsl.test.entity.UserAuthority;
 
 @Service
 @Transactional
@@ -32,7 +30,7 @@ public class BookService extends EntityService<Book> {
             .fetch();
     }
 
-    public void join(List<User> userList)  {
+    public void manualJoin(List<User> userList)  {
         if (userList == null) {
             return;
         }

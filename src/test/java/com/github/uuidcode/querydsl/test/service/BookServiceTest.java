@@ -24,7 +24,7 @@ public class BookServiceTest extends CoreTest {
             .setName(CoreUtil.createUUID())
             .setRegDatetime(new Date())
             .setModDatetime(new Date())
-            .setUserId(14L);
+            .setUserId(1L);
         this.bookService.save(book);
     }
 

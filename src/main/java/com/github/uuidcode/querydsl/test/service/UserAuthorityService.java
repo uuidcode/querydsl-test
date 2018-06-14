@@ -21,7 +21,7 @@ public class UserAuthorityService extends EntityService<UserAuthority> {
             .fetch();
     }
 
-    public void join(List<User> userList)  {
+    public void manualJoin(List<User> userList)  {
         if (userList == null) {
             return;
         }

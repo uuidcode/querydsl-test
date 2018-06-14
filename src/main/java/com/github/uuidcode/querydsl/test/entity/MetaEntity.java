@@ -7,17 +7,51 @@ import java.util.List;
 
 import javax.persistence.Id;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.uuidcode.querydsl.test.util.CoreUtil;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.NumberPath;
 
 public class MetaEntity<T> {
+    protected static Logger logger = LoggerFactory.getLogger(MetaEntity.class);
+
     private String className;
     private String qClassName;
     private String entityName;
     private EntityPathBase<T> entityPathBase;
     private NumberPath<Long> idPath;
+    private Field idField;
+    private Class entityClass;
+    private Class qClass;
 
+    public Class getQClass() {
+        return this.qClass;
+    }
+
+    public MetaEntity setQClass(Class qClass) {
+        this.qClass = qClass;
+        return this;
+    }
+
+    public Class getEntityClass() {
+        return this.entityClass;
+    }
+
+    public MetaEntity setEntityClass(Class entityClass) {
+        this.entityClass = entityClass;
+        return this;
+    }
+
+    public Field getIdField() {
+        return this.idField;
+    }
+
+    public MetaEntity setIdField(Field idField) {
+        this.idField = idField;
+        return this;
+    }
     public NumberPath<Long> getIdPath() {
         return this.idPath;
     }
@@ -68,9 +102,16 @@ public class MetaEntity<T> {
             String qClassName = getQClassName(className);
             String entityName = getEntityName(className);
 
+            if (logger.isDebugEnabled()) {
+                logger.debug(">>> of className: {}", CoreUtil.toJson(className));
+                logger.debug(">>> of entityName: {}", CoreUtil.toJson(entityName));
+                logger.debug(">>> of qClassName: {}", CoreUtil.toJson(qClassName));
+            }
+
             Class entityClass = Class.forName(className);
             Class qClass = Class.forName(qClassName);
             Field idField = getIdField(entityClass);
+            idField.setAccessible(true);
             Field idFieldOfQClass = qClass.getDeclaredField(idField.getName());
             Field field = qClass.getDeclaredField(entityName);
 
@@ -81,7 +122,10 @@ public class MetaEntity<T> {
                 .setClassName(className)
                 .setQClassName(qClassName)
                 .setEntityPathBase(entityPathBase)
-                .setIdPath(idPath);
+                .setIdPath(idPath)
+                .setIdField(idField)
+                .setEntityClass(entityClass)
+                .setQClass(qClass);
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }

@@ -112,6 +112,14 @@ public class UserServiceTest extends CoreTest {
     }
 
     @Test
+    public void manualJoin() {
+        List<User> list = this.userService.list();
+        this.userAuthorityService.manualJoin(list);
+        this.bookService.manualJoin(list);
+        CoreUtil.printJson(logger, list);
+    }
+
+    @Test
     public void join2() {
         List<User> userList = this.userService.list()
             .stream()
