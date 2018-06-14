@@ -37,7 +37,7 @@ public class WebConfiguration {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setUrl("jdbc:p6spy:mysql://127.0.0.1:3306/querydsl");
         dataSource.setUsername("root");
-        dataSource.setPassword("root");
+        dataSource.setPassword("rootroot");
         dataSource.setDriverClassName(P6SpyDriver.class.getName());
         return dataSource;
     }
@@ -61,6 +61,8 @@ public class WebConfiguration {
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
         properties.setProperty("hibernate.dialect", MySQL5Dialect.class.getName());
         properties.setProperty("hibernate.physical_naming_strategy", DefaultPhysicalNamingStrategy.class.getName());
+        properties.setProperty("org.hibernate.envers.audit_table_suffix", "_history");
+        properties.setProperty("org.hibernate.envers.store_data_at_delete", "true");
         return properties;
     }
 

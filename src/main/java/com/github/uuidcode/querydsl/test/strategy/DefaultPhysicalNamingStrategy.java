@@ -37,7 +37,13 @@ public class DefaultPhysicalNamingStrategy implements PhysicalNamingStrategy {
             return null;
         }
 
-        String lowerUnderscore = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, identifier.getText());
+        String text = identifier.getText();
+
+        if (text.equals(text.toUpperCase())) {
+            text = text.toLowerCase();
+        }
+
+        String lowerUnderscore = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, text);
         return Identifier.toIdentifier(lowerUnderscore);
     }
 }

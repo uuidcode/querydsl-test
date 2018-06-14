@@ -45,17 +45,18 @@ public class EntityService<T> {
         return t;
     }
 
-    public long remove(Long id) {
+    public void remove(T t) {
+        t = this.entityManager.merge(t);
+        this.entityManager.remove(t);
+    }
+
+    public void remove(Long id) {
         if (id == null) {
-            return 0;
+            return;
         }
 
-        MetaEntity<T> metaEntity = MetaEntity.of(this.getClass());
-
-        return this.createQuery()
-            .delete(metaEntity.getEntityPathBase())
-            .where(metaEntity.getIdPath().eq(id))
-            .execute();
+        T t = this.get(id);
+        this.remove(t);
     }
 
     public T update(T t) {

@@ -34,4 +34,15 @@ public class BookServiceTest extends CoreTest {
         List<Book> bookList = this.bookService.listAll();
         CoreUtil.printJson(logger, bookList);
     }
+    
+    @Test
+    public void audit() {
+        Book book = Book.of()
+            .setName(CoreUtil.createUUID())
+            .setRegDatetime(new Date())
+            .setModDatetime(new Date());
+        this.bookService.save(book);
+        this.bookService.update(book.setName(CoreUtil.createUUID()));
+        this.bookService.remove(book);
+    }
 }
