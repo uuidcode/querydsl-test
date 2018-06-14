@@ -35,9 +35,6 @@ public class BookService extends EntityService<Book> {
             return;
         }
 
-        Map<Long, User> userMap = userList.stream()
-            .collect(Collectors.toMap(User::getUserId, Function.identity()));
-
         List<Long> idList = userList.stream()
             .map(User::getUserId)
             .collect(Collectors.toList());
@@ -48,12 +45,11 @@ public class BookService extends EntityService<Book> {
             .where(QBook.book.userId.in(idList))
             .fetch();
 
-        bookList.forEach(book -> {
-            User user = userMap.get(book.getUserId());
+        Map<Long, List<Book>> map = bookList.stream()
+            .collect(Collectors.groupingBy(Book::getUserId));
 
-            if (user != null) {
-                user.addBook(book);
-            }
+        userList.forEach(user -> {
+            user.setBookList(map.get(user.getUserId()));
         });
     }
 }
