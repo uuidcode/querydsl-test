@@ -1,7 +1,8 @@
 package com.github.uuidcode.querydsl.test.service;
 
+import static java.util.stream.Collectors.groupingBy;
+
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -87,13 +88,7 @@ public class EntityService<T> {
         parentIdField.setAccessible(true);
 
         List<Long> idList = list.stream()
-            .map(object -> {
-                try {
-                    return (Long) parentIdField.get(object);
-                } catch (Throwable t) {
-                    throw new RuntimeException(t);
-                }
-            })
+            .map(object -> CoreUtil.getId(object))
             .collect(Collectors.toList());
 
         String parentIdName = parentIdField.getName();
@@ -104,13 +99,11 @@ public class EntityService<T> {
 
         MetaEntity<T> childMetaEntity = MetaEntity.of(this.getClass());
         EntityPathBase<T> qObject = childMetaEntity.getEntityPathBase();
-        Class childQClass = childMetaEntity.getQClass();
         Class childEntityClass = childMetaEntity.getEntityClass();
 
         try {
-            Field foreignKeyField = childQClass.getDeclaredField(parentIdName);
-            foreignKeyField.setAccessible(true);
-            NumberPath<Long> foreignKeyPath = (NumberPath<Long>) foreignKeyField.get(qObject);
+            NumberPath<Long> foreignKeyPath = CoreUtil.getIdPath(qObject, parentIdName);
+
             List<T> childList = this.createQuery()
                 .select(qObject)
                 .from(qObject)
@@ -118,25 +111,9 @@ public class EntityService<T> {
                 .fetch();
 
             Map<Long, List<T>> map = childList.stream()
-                .collect(Collectors.groupingBy(child -> {
-                    try {
-                        Field field = child.getClass().getDeclaredField(parentIdName);
-                        field.setAccessible(true);
-                        return (Long) field.get(child);
-                    } catch (Throwable t) {
-                        throw new RuntimeException(t);
-                    }
-                }));
+                .collect(groupingBy(child -> CoreUtil.getId(child, parentIdName)));
 
-            list.forEach(parent -> {
-                try {
-                    Long id = (Long) parentIdField.get(parent);
-                    Method method = parentClass.getDeclaredMethod("set" + childEntityClass.getSimpleName() + "List", List.class);
-                    method.invoke(parent, map.get(id));
-                } catch (Throwable t) {
-                    throw new RuntimeException(t);
-                }
-            });
+            list.forEach(parent -> CoreUtil.invokeSetListMethod(map, parent, childEntityClass));
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
