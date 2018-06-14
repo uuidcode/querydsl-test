@@ -45,4 +45,11 @@ public class BookServiceTest extends CoreTest {
         this.bookService.update(book.setName(CoreUtil.createUUID()));
         this.bookService.remove(book);
     }
+
+    @Test
+    public void audit2() {
+        Book book = this.bookService.get(1L);
+        book.setName(CoreUtil.createUUID());
+        this.bookService.update(book.setModDatetime(new Date()));
+    }
 }

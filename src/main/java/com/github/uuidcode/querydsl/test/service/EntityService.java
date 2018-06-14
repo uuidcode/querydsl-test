@@ -25,7 +25,6 @@ public class EntityService<T> {
         }
 
         MetaEntity<T> metaEntity = MetaEntity.of(this.getClass());
-
         EntityPathBase<T> qObject = metaEntity.getEntityPathBase();
         NumberPath<Long> idPath = metaEntity.getIdPath();
 
