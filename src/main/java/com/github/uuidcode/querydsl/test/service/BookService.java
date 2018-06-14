@@ -1,5 +1,7 @@
 package com.github.uuidcode.querydsl.test.service;
 
+import static java.util.stream.Collectors.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -37,7 +39,7 @@ public class BookService extends EntityService<Book> {
 
         List<Long> idList = userList.stream()
             .map(User::getUserId)
-            .collect(Collectors.toList());
+            .collect(toList());
 
         List<Book> bookList = this.createQuery()
             .select(QBook.book)
@@ -46,7 +48,7 @@ public class BookService extends EntityService<Book> {
             .fetch();
 
         Map<Long, List<Book>> map = bookList.stream()
-            .collect(Collectors.groupingBy(Book::getUserId));
+            .collect(groupingBy(Book::getUserId));
 
         userList.forEach(user -> {
             user.setBookList(map.get(user.getUserId()));
