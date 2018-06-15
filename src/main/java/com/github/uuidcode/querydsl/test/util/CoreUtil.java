@@ -2,20 +2,15 @@ package com.github.uuidcode.querydsl.test.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import javax.persistence.Id;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -33,7 +28,6 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import com.querydsl.core.types.dsl.NumberPath;
 
 public class CoreUtil {
     protected static Logger logger = LoggerFactory.getLogger(CoreUtil.class);
@@ -433,62 +427,6 @@ public class CoreUtil {
     public static void printJson(Logger logger, Object object) {
         if (logger.isDebugEnabled()) {
             logger.debug(">>> printJson object: {}", CoreUtil.toJson(object));
-        }
-    }
-
-    public static Long getId(Object object) {
-        Field idField = CoreUtil.getIdField(object.getClass());
-        return CoreUtil.getId(object, idField.getName());
-    }
-
-    public static Long getId(Object object, String idFieldName) {
-        try {
-            Field field = object.getClass().getDeclaredField(idFieldName);
-            field.setAccessible(true);
-            return (Long) field.get(object);
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
-    }
-
-    public static <T> void invokeSetListMethod(Map<Long, List<T>> map, Object parent, Class childClass) {
-        try {
-            Class clazz = parent.getClass();
-            Field idField = CoreUtil.getIdField(clazz);
-            Long id = (Long) idField.get(parent);
-            String setMethodName = "set" + childClass.getSimpleName() + "List";
-            Method setMethod = clazz.getDeclaredMethod(setMethodName, List.class);
-            setMethod.invoke(parent, map.get(id));
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
-    }
-
-    public static Field getIdField(Class clazz) {
-        Field[] declaredFields = clazz.getDeclaredFields();
-        Field idField = Arrays.stream(declaredFields)
-            .filter(field -> field.getAnnotation(Id.class) != null)
-            .findFirst()
-            .map(field -> {
-                field.setAccessible(true);
-                return field;
-            })
-            .orElse(null);
-
-        if (idField == null) {
-            throw new RuntimeException("@Id field doesn't exist.");
-        }
-
-        return idField;
-    }
-
-    public static NumberPath<Long> getIdPath(Object qObject, String id) {
-        try {
-            Field field = qObject.getClass().getDeclaredField(id);
-            field.setAccessible(true);
-            return (NumberPath<Long>) field.get(qObject);
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
         }
     }
 }

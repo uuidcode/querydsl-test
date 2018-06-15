@@ -1,13 +1,14 @@
 package com.github.uuidcode.querydsl.test.service;
 
-import static java.util.stream.Collectors.groupingBy;
-
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Id;
 import javax.persistence.PersistenceContext;
 
 import org.slf4j.Logger;
@@ -19,6 +20,8 @@ import com.github.uuidcode.querydsl.test.util.CoreUtil;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Transactional
 public class EntityService<T> {
@@ -88,7 +91,7 @@ public class EntityService<T> {
         parentIdField.setAccessible(true);
 
         List<Long> idList = list.stream()
-            .map(object -> CoreUtil.getId(object))
+            .map(object -> this.getId(object))
             .collect(Collectors.toList());
 
         String parentIdName = parentIdField.getName();
@@ -102,7 +105,7 @@ public class EntityService<T> {
         Class childEntityClass = childMetaEntity.getEntityClass();
 
         try {
-            NumberPath<Long> foreignKeyPath = CoreUtil.getIdPath(qObject, parentIdName);
+            NumberPath<Long> foreignKeyPath = this.getIdPath(qObject, parentIdName);
 
             List<T> childList = this.createQuery()
                 .select(qObject)
@@ -111,9 +114,65 @@ public class EntityService<T> {
                 .fetch();
 
             Map<Long, List<T>> map = childList.stream()
-                .collect(groupingBy(child -> CoreUtil.getId(child, parentIdName)));
+                .collect(groupingBy(child -> this.getId(child, parentIdName)));
 
-            list.forEach(parent -> CoreUtil.invokeSetListMethod(map, parent, childEntityClass));
+            list.forEach(parent -> this.invokeSetListMethod(map, parent, childEntityClass));
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    public Long getId(Object object) {
+        Field idField = this.getIdField(object.getClass());
+        return this.getId(object, idField.getName());
+    }
+
+    public Long getId(Object object, String idFieldName) {
+        try {
+            Field field = object.getClass().getDeclaredField(idFieldName);
+            field.setAccessible(true);
+            return (Long) field.get(object);
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    public <T> void invokeSetListMethod(Map<Long, List<T>> map, Object parent, Class childClass) {
+        try {
+            Class clazz = parent.getClass();
+            Field idField = this.getIdField(clazz);
+            Long id = (Long) idField.get(parent);
+            String setMethodName = "set" + childClass.getSimpleName() + "List";
+            Method setMethod = clazz.getDeclaredMethod(setMethodName, List.class);
+            setMethod.invoke(parent, map.get(id));
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+    }
+
+    public Field getIdField(Class clazz) {
+        Field[] declaredFields = clazz.getDeclaredFields();
+        Field idField = Arrays.stream(declaredFields)
+            .filter(field -> field.getAnnotation(Id.class) != null)
+            .findFirst()
+            .map(field -> {
+                field.setAccessible(true);
+                return field;
+            })
+            .orElse(null);
+
+        if (idField == null) {
+            throw new RuntimeException("@Id field doesn't exist.");
+        }
+
+        return idField;
+    }
+
+    public NumberPath<Long> getIdPath(Object qObject, String id) {
+        try {
+            Field field = qObject.getClass().getDeclaredField(id);
+            field.setAccessible(true);
+            return (NumberPath<Long>) field.get(qObject);
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }

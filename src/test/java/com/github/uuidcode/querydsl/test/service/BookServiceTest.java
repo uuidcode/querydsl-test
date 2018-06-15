@@ -19,7 +19,7 @@ public class BookServiceTest extends CoreTest {
     private BookService bookService;
 
     @Test
-    public void insert() {
+    public void save() {
         Book book = Book.of()
             .setName(CoreUtil.createUUID())
             .setRegDatetime(new Date())

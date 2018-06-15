@@ -1,4 +1,4 @@
-package com.github.uuidcode.querydsl.test;
+package com.github.uuidcode.querydsl.test.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,12 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.github.uuidcode.querydsl.test.CoreTest;
 import com.github.uuidcode.querydsl.test.entity.Book;
 import com.github.uuidcode.querydsl.test.entity.User;
 import com.github.uuidcode.querydsl.test.entity.UserAuthority;
-import com.github.uuidcode.querydsl.test.service.BookService;
-import com.github.uuidcode.querydsl.test.service.UserAuthorityService;
-import com.github.uuidcode.querydsl.test.service.UserService;
 import com.github.uuidcode.querydsl.test.util.CoreUtil;
 
 public class UserServiceTest extends CoreTest {
@@ -136,5 +134,11 @@ public class UserServiceTest extends CoreTest {
         if (logger.isDebugEnabled()) {
             logger.debug(">>> join2 userList: {}", CoreUtil.toJson(userList));
         }
+    }
+
+    @Test
+    public void list2() {
+        List<User> userList = this.userService.list2();
+        CoreUtil.printJson(logger, userList);
     }
 }
