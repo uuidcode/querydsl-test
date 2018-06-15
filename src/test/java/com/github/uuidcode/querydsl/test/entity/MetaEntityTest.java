@@ -12,5 +12,4 @@ public class MetaEntityTest {
         Field idField = MetaEntity.getIdField(User.class);
         assertThat(idField.getName()).isEqualTo("userId");
     }
-
 }

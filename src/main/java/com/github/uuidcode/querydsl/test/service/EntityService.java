@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.uuidcode.querydsl.test.entity.MetaEntity;
-import com.github.uuidcode.querydsl.test.util.CoreUtil;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -78,11 +77,7 @@ public class EntityService<T> {
     }
 
     public <PARENT> void join(List<PARENT> list) {
-        if (list == null) {
-            return;
-        }
-
-        if (list.size() == 0) {
+        if (list == null || list.size() == 0) {
             return;
         }
 
@@ -95,31 +90,21 @@ public class EntityService<T> {
             .collect(Collectors.toList());
 
         String parentIdName = parentIdField.getName();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(">>> join parentIdName: {}", CoreUtil.toJson(parentIdName));
-        }
-
         MetaEntity<T> childMetaEntity = MetaEntity.of(this.getClass());
         EntityPathBase<T> qObject = childMetaEntity.getEntityPathBase();
         Class childEntityClass = childMetaEntity.getEntityClass();
+        NumberPath<Long> foreignKeyPath = this.getIdPath(qObject, parentIdName);
 
-        try {
-            NumberPath<Long> foreignKeyPath = this.getIdPath(qObject, parentIdName);
+        List<T> childList = this.createQuery()
+            .select(qObject)
+            .from(qObject)
+            .where(foreignKeyPath.in(idList))
+            .fetch();
 
-            List<T> childList = this.createQuery()
-                .select(qObject)
-                .from(qObject)
-                .where(foreignKeyPath.in(idList))
-                .fetch();
+        Map<Long, List<T>> map = childList.stream()
+            .collect(groupingBy(child -> this.getId(child, parentIdName)));
 
-            Map<Long, List<T>> map = childList.stream()
-                .collect(groupingBy(child -> this.getId(child, parentIdName)));
-
-            list.forEach(parent -> this.invokeSetListMethod(map, parent, childEntityClass));
-        } catch (Throwable t) {
-            throw new RuntimeException(t);
-        }
+        list.forEach(parent -> this.invokeSetListMethod(map, parent, childEntityClass));
     }
 
     public Long getId(Object object) {

@@ -27,6 +27,18 @@ public class UserServiceTest extends CoreTest {
     private BookService bookService;
 
     @Test
+    public void get() {
+        User user = this.userService.get(1L);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> get user: {}", CoreUtil.toJson(user.getClass().getName()));
+        }
+
+        user.setUsername(CoreUtil.createUUID());
+        this.userService.update(user);
+    }
+
+    @Test
     public void nullTest() {
         User user = this.userService.get(null);
 
@@ -98,6 +110,11 @@ public class UserServiceTest extends CoreTest {
     @Test
     public void list() {
         List<User> list = this.userService.list();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> list list: {}", CoreUtil.toJson(list.getClass().getName()));
+        }
+
         CoreUtil.printJson(logger, list);
     }
 
@@ -140,5 +157,13 @@ public class UserServiceTest extends CoreTest {
     public void list2() {
         List<User> userList = this.userService.list2();
         CoreUtil.printJson(logger, userList);
+    }
+
+    @Test
+    public void saveAndRemove() {
+        User user = User.of().setUsername(CoreUtil.createUUID());
+
+        this.userService.save(user);
+        this.userService.remove(user);
     }
 }

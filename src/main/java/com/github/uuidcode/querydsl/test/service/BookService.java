@@ -1,11 +1,7 @@
 package com.github.uuidcode.querydsl.test.service;
 
-import static java.util.stream.Collectors.*;
-
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.github.uuidcode.querydsl.test.entity.Book;
 import com.github.uuidcode.querydsl.test.entity.QBook;
 import com.github.uuidcode.querydsl.test.entity.User;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Transactional
@@ -51,7 +50,31 @@ public class BookService extends EntityService<Book> {
             .collect(groupingBy(Book::getUserId));
 
         userList.forEach(user -> {
-            user.setBookList(map.get(user.getUserId()));
+            List<Book> currentBookList = map.get(user.getUserId());
+            user.setBookList(currentBookList);
         });
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
