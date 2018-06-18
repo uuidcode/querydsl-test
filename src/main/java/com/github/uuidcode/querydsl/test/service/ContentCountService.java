@@ -24,7 +24,6 @@ public class ContentCountService extends EntityService<ContentCount> {
             .where(QContentCount.contentCount.contentType.eq(contentCount.getContentType()))
             .where(QContentCount.contentCount.contentId.in(contentCount.getContentIdList()))
             .fetch();
-
     }
 
     public void manualJoin(List<User> userList) {
