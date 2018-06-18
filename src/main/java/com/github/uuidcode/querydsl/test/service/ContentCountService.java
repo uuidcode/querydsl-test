@@ -1,14 +1,19 @@
 package com.github.uuidcode.querydsl.test.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.github.uuidcode.querydsl.test.entity.ContentCount;
 import com.github.uuidcode.querydsl.test.entity.QContentCount;
 import com.github.uuidcode.querydsl.test.entity.User;
+
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 public class ContentCountService extends EntityService<ContentCount> {
@@ -21,6 +26,7 @@ public class ContentCountService extends EntityService<ContentCount> {
             .fetch();
 
     }
+
     public void manualJoin(List<User> userList) {
         if (userList == null) {
             return;
@@ -28,7 +34,7 @@ public class ContentCountService extends EntityService<ContentCount> {
 
         List<Long> userIdList = userList.stream()
             .map(User::getUserId)
-            .collect(Collectors.toList());
+            .collect(toList());
 
         ContentCount contentCount = ContentCount.of()
             .setContentType(ContentCount.ContentType.USER)
@@ -37,16 +43,17 @@ public class ContentCountService extends EntityService<ContentCount> {
         List<ContentCount> contentCountList = this.list(contentCount);
 
         Map<Long, List<ContentCount>> contentCountMap = contentCountList.stream()
-            .collect(Collectors.groupingBy(ContentCount::getContentId));
+            .collect(groupingBy(ContentCount::getContentId));
 
         userList.forEach(user -> {
             List<ContentCount> countList = contentCountMap.get(user.getUserId());
 
-            if (countList != null) {
-                Map<ContentCount.CountType, Long> countMap = countList.stream()
-                    .collect(Collectors.toMap(ContentCount::getCountType, ContentCount::getCount));
-                user.setContentCountMap(countMap);
-            }
+            Map<ContentCount.CountType, Long> countMap = ofNullable(countList)
+                .orElse(new ArrayList<>())
+                .stream()
+                .collect(toMap(ContentCount::getCountType, ContentCount::getCount));
+
+            user.setContentCountMap(countMap);
         });
     }
 }
