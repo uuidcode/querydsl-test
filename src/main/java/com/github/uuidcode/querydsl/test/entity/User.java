@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
+
+import com.github.uuidcode.querydsl.test.entity.ContentCount.CountType;
 
 @Entity
 public class User {
@@ -28,6 +31,17 @@ public class User {
     private List<UserAuthority> userAuthorityList = new ArrayList<>();
     @Transient
     private List<Book> bookList = new ArrayList<>();
+    @Transient
+    private Map<CountType, Long> contentCountMap;
+
+    public Map<CountType, Long> getContentCountMap() {
+        return this.contentCountMap;
+    }
+
+    public User setContentCountMap(Map<CountType, Long> contentCountMap) {
+        this.contentCountMap = contentCountMap;
+        return this;
+    }
 
     public User addBook(Book book) {
         this.bookList.add(book);

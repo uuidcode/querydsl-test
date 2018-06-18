@@ -26,6 +26,9 @@ public class UserServiceTest extends CoreTest {
     @Autowired
     private BookService bookService;
 
+    @Autowired
+    private ContentCountService contentCountService;
+
     @Test
     public void get() {
         User user = this.userService.get(1L);
@@ -131,6 +134,7 @@ public class UserServiceTest extends CoreTest {
         List<User> list = this.userService.list();
         this.userAuthorityService.manualJoin(list);
         this.bookService.manualJoin(list);
+        this.contentCountService.manualJoin(list);
         CoreUtil.printJson(logger, list);
     }
 
