@@ -2,6 +2,7 @@ package com.github.uuidcode.querydsl.test.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,12 +18,19 @@ import org.apache.commons.lang3.time.FastDateFormat;
 import org.hibernate.engine.jdbc.internal.BasicFormatterImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageImpl;
 
 import com.google.common.base.CaseFormat;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -157,6 +165,7 @@ public class CoreUtil {
             .registerTypeAdapter(String.class, StringTypeAdapter)
             .registerTypeAdapter(Class.class, ClassTypeAdapter)
             .registerTypeAdapter(Date.class, DateTypeAdapter)
+            .registerTypeAdapter(PageImpl.class, new PageDeserializer(PageImpl.class))
             .disableHtmlEscaping()
             .setPrettyPrinting()
             .addSerializationExclusionStrategy(new ExclusionStrategy() {

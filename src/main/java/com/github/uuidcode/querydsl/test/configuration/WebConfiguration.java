@@ -17,6 +17,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -33,6 +34,7 @@ import com.github.uuidcode.querydsl.test.strategy.DefaultPhysicalNamingStrategy;
 import com.p6spy.engine.spy.P6SpyDriver;
 
 @Configuration
+@EnableJpaRepositories(basePackageClasses = Entry.class)
 @ComponentScan(basePackageClasses = Entry.class)
 @EnableTransactionManagement
 @MapperScan(basePackageClasses = UserDao.class)
@@ -50,7 +52,7 @@ public class WebConfiguration {
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean containerEntityManagerFactoryBean() {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean factoryBean
             = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(this.dataSource());
