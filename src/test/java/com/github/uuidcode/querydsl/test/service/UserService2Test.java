@@ -75,4 +75,20 @@ public class UserService2Test extends CoreTest {
             logger.debug(">>> test user: {}", CoreUtil.toJson(user));
         }
     }
+
+    @Test
+    public void getTest() {
+        User user = this.userService2.getOne(1L);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> getTest user: {}", CoreUtil.toJson(user));
+        }
+
+        Long userId = user.getUserId();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> getTest userId: {}", CoreUtil.toJson(userId));
+            logger.debug(">>> getTest user: {}", CoreUtil.toJson(user));
+        }
+    }
 }

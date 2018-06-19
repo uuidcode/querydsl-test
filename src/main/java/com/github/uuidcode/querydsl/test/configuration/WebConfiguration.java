@@ -72,6 +72,7 @@ public class WebConfiguration {
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
         properties.setProperty("hibernate.dialect", MySQL5Dialect.class.getName());
         properties.setProperty("hibernate.physical_naming_strategy", DefaultPhysicalNamingStrategy.class.getName());
+        properties.setProperty("hibernate.enable_lazy_load_no_trans", "true");
         properties.setProperty("org.hibernate.envers.audit_table_suffix", "_history");
         properties.setProperty("org.hibernate.envers.store_data_at_delete", "true");
         return properties;

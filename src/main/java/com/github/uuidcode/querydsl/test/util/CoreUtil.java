@@ -32,6 +32,8 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
+import javassist.util.proxy.MethodHandler;
+
 public class CoreUtil {
     protected static Logger logger = LoggerFactory.getLogger(CoreUtil.class);
 
@@ -166,7 +168,7 @@ public class CoreUtil {
             .addSerializationExclusionStrategy(new ExclusionStrategy() {
                 Set<Class> excludedClassSet = new HashSet() {{
                     this.add(Class.class);
-//                    this.add(MethodHandler.class);
+                    this.add(MethodHandler.class);
                 }};
 
                 @Override
