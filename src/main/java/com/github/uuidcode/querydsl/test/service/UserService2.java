@@ -14,6 +14,7 @@ import com.github.uuidcode.querydsl.test.entity.Book;
 import com.github.uuidcode.querydsl.test.entity.Payload;
 import com.github.uuidcode.querydsl.test.entity.QBook;
 import com.github.uuidcode.querydsl.test.entity.User;
+import com.github.uuidcode.querydsl.test.util.CoreUtil;
 import com.querydsl.core.types.Predicate;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -38,20 +39,9 @@ public class UserService2 extends QuerydslService<User, Long> {
     public Payload findAllWithJoin(Predicate predicate, Pageable pageable) {
         Page<User> userPage = this.findAll(predicate, pageable);
         List<User> userList = userPage.getContent();
-        List<Long> userIdList = userList.stream()
-            .map(User::getUserId)
-            .collect(toList());
-
+        List<Long> userIdList = CoreUtil.map(userList, User::getUserId);
         List<Book> bookList = this.bookService2.findAll(QBook.book.userId.in(userIdList));
-        Map<Long, List<Book>> bookListMap = bookList.stream().collect(groupingBy(Book::getUserId));
-
-        userList.forEach(user -> {
-            List<Book> currentBookList = bookListMap.get(user.getUserId());
-            user.setBookList(currentBookList);
-        });
-
-        return Payload.of()
-            .paging(pageable.getPageNumber() + 1, 10L, 10L, userPage.getTotalElements())
-            .setUserList(userList);
+        CoreUtil.fill(userList, bookList, Book::getUserId, User::setBookList);
+        return Payload.of(userPage).setUserList(userList);
     }
 }

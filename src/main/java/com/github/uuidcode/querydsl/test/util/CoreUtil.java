@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageImpl;
 
 import com.github.uuidcode.querydsl.test.configuration.BinderConfiguration;
+import com.github.uuidcode.querydsl.test.entity.Book;
 import com.google.common.base.CaseFormat;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
@@ -654,4 +657,31 @@ public class CoreUtil {
         return format.format(date);
     }
 
+    public static <T, R> List<R> map(List<T> list, Function<T, R> mapper) {
+        return list.stream()
+            .map(mapper)
+            .collect(Collectors.toList());
+    }
+
+    public static <T, R> Map<R, List<T>> groupBy(List<T> list, Function<T, R> mapper) {
+        return list.stream()
+            .collect(Collectors.groupingBy(mapper));
+    }
+
+    public static <T, R> List<T> fill(List<T> list, Map<Long, List<R>> map, BiFunction<T, List<R>, T> biFunction) {
+        list.forEach(i -> {
+            List<R> resultList = map.get(i);
+            biFunction.apply(i, resultList);
+        });
+
+        return list;
+    }
+
+    public static <T, R> List<T> fill(List<T> parentList,
+                                      List<R> childList,
+                                      Function<R, Long> childMapper,
+                                      BiFunction<T, List<R>, T> biFunction) {
+        Map<Long, List<R>> map = CoreUtil.groupBy(childList, childMapper);
+        return fill(parentList, map, biFunction);
+    }
 }
