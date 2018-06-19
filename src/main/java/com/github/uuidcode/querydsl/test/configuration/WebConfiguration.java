@@ -1,5 +1,6 @@
 package com.github.uuidcode.querydsl.test.configuration;
 
+import java.util.List;
 import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
@@ -19,6 +20,8 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -26,22 +29,34 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.github.jknack.handlebars.springmvc.HandlebarsViewResolver;
-import com.github.uuidcode.querydsl.test.Entry;
+import com.github.uuidcode.querydsl.test.Application;
+import com.github.uuidcode.querydsl.test.converter.GsonHttpMessageConverter;
 import com.github.uuidcode.querydsl.test.dao.UserDao;
 import com.github.uuidcode.querydsl.test.entity.EntityEntry;
 import com.github.uuidcode.querydsl.test.strategy.DefaultPhysicalNamingStrategy;
 import com.p6spy.engine.spy.P6SpyDriver;
 
 @Configuration
-@EnableJpaRepositories(basePackageClasses = Entry.class)
-@ComponentScan(basePackageClasses = Entry.class)
+@EnableWebMvc
+@EnableSpringDataWebSupport
 @EnableTransactionManagement
+@EnableJpaRepositories(basePackageClasses = Application.class)
+@ComponentScan(basePackageClasses = Application.class)
 @MapperScan(basePackageClasses = UserDao.class)
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-public class WebConfiguration {
+public class WebConfiguration extends WebMvcConfigurerAdapter {
     protected static Logger logger = LoggerFactory.getLogger(WebConfiguration.class);
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        GsonHttpMessageConverter gsonHttpMessageConverter = new GsonHttpMessageConverter();
+        converters.add(gsonHttpMessageConverter);
+        super.configureMessageConverters(converters);
+    }
 
     @Bean
     public DataSource dataSource() {

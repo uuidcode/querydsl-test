@@ -51,7 +51,7 @@ public class UserService2 extends QuerydslService<User, Long> {
         });
 
         return Payload.of()
-            .paging(pageable.getPageNumber(), 10L, 10L, userPage.getTotalElements())
+            .paging(pageable.getPageNumber() + 1, 10L, 10L, userPage.getTotalElements())
             .setUserList(userList);
     }
 }
