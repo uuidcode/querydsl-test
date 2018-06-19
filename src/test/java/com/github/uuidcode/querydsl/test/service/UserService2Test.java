@@ -66,7 +66,8 @@ public class UserService2Test extends CoreTest {
         }
 
         for (int i = 0; i < 3; i++) {
-            this.bookService2.save(Book.of().setUserId(user.getUserId()).setName(CoreUtil.createUUID()));
+            Book book = Book.of().setUserId(user.getUserId()).setName(CoreUtil.createUUID());
+            this.bookService2.save(book);
         }
 
         user = this.userService2.findOneWithJoin(user.getUserId());
