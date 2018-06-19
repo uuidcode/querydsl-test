@@ -44,4 +44,21 @@ public class UserService2Test extends CoreTest {
             logger.debug(">>> join userList: {}", CoreUtil.toJson(userList));
         }
     }
+
+    @Test
+    public void test() throws Exception {
+        User user = User.of().setUsername(CoreUtil.createUUID());
+        this.userService2.save(user);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> test user: {}", CoreUtil.toJson(user));
+        }
+
+        user = this.userService2.findOne(user.getUserId());
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> test user: {}", CoreUtil.toJson(user.getClass().getName()));
+            logger.debug(">>> test user: {}", CoreUtil.toJson(user));
+        }
+    }
 }
