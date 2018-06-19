@@ -6,12 +6,17 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.querydsl.QSort;
 
 import com.github.uuidcode.querydsl.test.CoreTest;
 import com.github.uuidcode.querydsl.test.entity.Book;
+import com.github.uuidcode.querydsl.test.entity.Payload;
 import com.github.uuidcode.querydsl.test.entity.QUser;
 import com.github.uuidcode.querydsl.test.entity.User;
 import com.github.uuidcode.querydsl.test.util.CoreUtil;
+import com.querydsl.core.types.dsl.BooleanExpression;
 
 public class UserService2Test extends CoreTest {
     protected static Logger logger = LoggerFactory.getLogger(UserService2Test.class);
@@ -37,15 +42,6 @@ public class UserService2Test extends CoreTest {
 
         if (logger.isDebugEnabled()) {
             logger.debug(">>> test userList: {}", CoreUtil.toJson(userList));
-        }
-    }
-
-    @Test
-    public void join() {
-        List<User> userList = this.userService2.findAllWithJoin();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(">>> join userList: {}", CoreUtil.toJson(userList));
         }
     }
 
@@ -90,6 +86,42 @@ public class UserService2Test extends CoreTest {
         if (logger.isDebugEnabled()) {
             logger.debug(">>> getTest userId: {}", CoreUtil.toJson(userId));
             logger.debug(">>> getTest user: {}", CoreUtil.toJson(user));
+        }
+    }
+
+    @Test
+    public void save() {
+        for (int i = 0; i < 100; i++) {
+            this.userService2.save(User.of().setUsername(CoreUtil.createUUID()));
+        }
+    }
+
+    @Test
+    public void sort() {
+        int pageNumber = 1;
+        QPageRequest pageable = new QPageRequest(pageNumber - 1, 10, new QSort(QUser.user.username.desc()));
+        BooleanExpression predicate = QUser.user.userId.mod(2L).eq(0L);
+
+        Page<User> page= this.userService2.findAll(predicate, pageable);
+
+        Payload payload = Payload.of()
+            .paging(page.getNumber() + 1, 10L, 10L, page.getTotalElements())
+            .setUserList(page.getContent());
+
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> sort payload: {}", CoreUtil.toJson(payload));
+        }
+    }
+
+    @Test
+    public void payload() {
+        QPageRequest pageable = new QPageRequest(0, 10, new QSort(QUser.user.userId.asc()));
+
+        Payload payload = this.userService2.findAllWithJoin(null, pageable);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> payload payload: {}", CoreUtil.toJson(payload));
         }
     }
 }

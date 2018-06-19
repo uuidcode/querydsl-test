@@ -3,16 +3,34 @@ package com.github.uuidcode.querydsl.test.entity;
 import java.io.Serializable;
 
 public class CoreObject<T extends CoreObject> implements Serializable {
-    private Integer page;
-    private Integer lastPage;
-    private Integer startPage;
-    private Integer endPage;
-    private Integer beforeStartPage;
-    private Integer beforeEndPage;
-    private Integer nextStartPage;
-    private Integer nextEndPage;
+    private Long page;
+    private Long lastPage;
+    private Long startPage;
+    private Long endPage;
+    private Long beforeStartPage;
+    private Long beforeEndPage;
+    private Long nextStartPage;
+    private Long nextEndPage;
+    private Long totalCount;
 
-    public T paging(Integer page, Integer pageSize, Integer pageItemSize, Integer totalCount) {
+    public Long getTotalCount() {
+        return this.totalCount;
+    }
+
+    public CoreObject setTotalCount(Long totalCount) {
+        this.totalCount = totalCount;
+        return this;
+    }
+
+    public T paging(Integer page, Long totalCount) {
+        return paging(new Long(page), 10L, 10L, totalCount);
+    }
+
+    public T paging(Integer page, Long pageSize, Long pageItemSize, Long totalCount) {
+        return paging(new Long(page), pageSize, pageItemSize, totalCount);
+    }
+
+    public T paging(Long page, Long pageSize, Long pageItemSize, Long totalCount) {
         this.page = page;
         this.startPage = calculateStartPage(page, pageSize);
         this.beforeStartPage = calculateBeforeStartPage(pageSize);
@@ -21,10 +39,11 @@ public class CoreObject<T extends CoreObject> implements Serializable {
         this.endPage = calculateEndPage(pageSize);
         this.nextStartPage = calculateNextStartPage(pageSize);
         this.nextEndPage = calculateNextEndPage(pageSize);
+        this.totalCount = totalCount;
         return (T) this;
     }
 
-    protected Integer calculateNextEndPage(Integer pageSize) {
+    protected Long calculateNextEndPage(Long pageSize) {
         if ((startPage + pageSize) <= lastPage) {
             if ((endPage + pageSize) <= lastPage) {
                 return endPage + pageSize;
@@ -34,14 +53,14 @@ public class CoreObject<T extends CoreObject> implements Serializable {
         return null;
     }
 
-    protected Integer calculateNextStartPage(Integer pageSize) {
+    protected Long calculateNextStartPage(Long pageSize) {
         if ((startPage + pageSize) <= lastPage) {
             return startPage + pageSize;
         }
         return null;
     }
 
-    protected Integer calculateBeforeEndPage(Integer pageSize) {
+    protected Long calculateBeforeEndPage(Long pageSize) {
         if (pageSize > startPage) {
             return null;
         }
@@ -50,24 +69,24 @@ public class CoreObject<T extends CoreObject> implements Serializable {
 
     }
 
-    protected Integer calculateBeforeStartPage(Integer pageSize) {
+    protected Long calculateBeforeStartPage(Long pageSize) {
         if (pageSize > startPage) {
             return null;
         }
         return startPage - pageSize;
     }
 
-    protected Integer calculateEndPage(Integer pageSize) {
+    protected Long calculateEndPage(Long pageSize) {
         if ((lastPage - startPage) >= pageSize) {
             return (startPage + pageSize - 1);
         }
         return lastPage;
     }
 
-    protected Integer calculateLastPage(Integer currentPage, Integer pageSize,
-                                        Integer pageItemSize, Integer totalCount) {
+    protected Long calculateLastPage(Long currentPage, Long pageSize,
+                                        Long pageItemSize, Long totalCount) {
         if (totalCount <= pageItemSize) {
-            return 1;
+            return 1L;
         }
 
         if (isMultiple(pageItemSize, totalCount)) {
@@ -78,33 +97,37 @@ public class CoreObject<T extends CoreObject> implements Serializable {
 
     }
 
-    private Boolean isMultiple(Integer lower, Integer larger) {
+    private Boolean isMultiple(Long lower, Long larger) {
         return (larger % lower) == 0;
     }
 
-    private Integer calculateStartPage(Integer currentPage, Integer pageSize) {
+    private Long calculateStartPage(Long currentPage, Long pageSize) {
         if (currentPage <= pageSize) {
-            return 1;
+            return 1L;
         }
 
-        int mod = currentPage%pageSize;
-        if(mod==0) mod=pageSize;
-        return currentPage-(mod-1);
+        long mod = currentPage % pageSize;
+
+        if(mod == 0) {
+            mod = pageSize;
+        }
+
+        return currentPage - (mod - 1);
     }
 
-    public Integer getPage() {
+    public Long getPage() {
         return page;
     }
 
-    public Integer getLastPage() {
+    public Long getLastPage() {
         return lastPage;
     }
 
-    public Integer getStartPage() {
+    public Long getStartPage() {
         return startPage;
     }
 
-    public Integer getEndPage() {
+    public Long getEndPage() {
         return endPage;
     }
 
@@ -112,11 +135,11 @@ public class CoreObject<T extends CoreObject> implements Serializable {
         return beforeStartPage != null && beforeEndPage != null;
     }
 
-    public Integer getBeforeStartPage() {
+    public Long getBeforeStartPage() {
         return beforeStartPage;
     }
 
-    public Integer getBeforeEndPage() {
+    public Long getBeforeEndPage() {
         return beforeEndPage;
     }
 
@@ -124,11 +147,11 @@ public class CoreObject<T extends CoreObject> implements Serializable {
         return nextStartPage != null && nextEndPage != null;
     }
 
-    public Integer getNextStartPage() {
+    public Long getNextStartPage() {
         return nextStartPage;
     }
 
-    public Integer getNextEndPage() {
+    public Long getNextEndPage() {
         return nextEndPage;
     }
 }

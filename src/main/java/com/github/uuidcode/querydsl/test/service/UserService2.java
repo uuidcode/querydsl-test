@@ -6,11 +6,15 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.github.uuidcode.querydsl.test.entity.Book;
+import com.github.uuidcode.querydsl.test.entity.Payload;
 import com.github.uuidcode.querydsl.test.entity.QBook;
 import com.github.uuidcode.querydsl.test.entity.User;
+import com.querydsl.core.types.Predicate;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -31,8 +35,9 @@ public class UserService2 extends QuerydslService<User, Long> {
         return user.setBookList(bookList);
     }
 
-    public List<User> findAllWithJoin() {
-        List<User> userList = this.findAll();
+    public Payload findAllWithJoin(Predicate predicate, Pageable pageable) {
+        Page<User> userPage = this.findAll(predicate, pageable);
+        List<User> userList = userPage.getContent();
         List<Long> userIdList = userList.stream()
             .map(User::getUserId)
             .collect(toList());
@@ -45,6 +50,8 @@ public class UserService2 extends QuerydslService<User, Long> {
             user.setBookList(currentBookList);
         });
 
-        return userList;
+        return Payload.of()
+            .paging(pageable.getPageNumber(), 10L, 10L, userPage.getTotalElements())
+            .setUserList(userList);
     }
 }
