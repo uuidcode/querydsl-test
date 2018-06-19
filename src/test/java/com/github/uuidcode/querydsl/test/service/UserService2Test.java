@@ -116,7 +116,8 @@ public class UserService2Test extends CoreTest {
 
     @Test
     public void payload() {
-        QPageRequest pageable = new QPageRequest(0, 10, new QSort(QUser.user.userId.asc()));
+        int pageNumber = 1;
+        QPageRequest pageable = new QPageRequest(pageNumber - 1, 10, new QSort(QUser.user.userId.asc()));
 
         Payload payload = this.userService2.findAllWithJoin(null, pageable);
 
