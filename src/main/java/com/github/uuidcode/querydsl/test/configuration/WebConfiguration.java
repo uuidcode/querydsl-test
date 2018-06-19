@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -38,6 +39,7 @@ import com.p6spy.engine.spy.P6SpyDriver;
 @ComponentScan(basePackageClasses = Entry.class)
 @EnableTransactionManagement
 @MapperScan(basePackageClasses = UserDao.class)
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class WebConfiguration {
     protected static Logger logger = LoggerFactory.getLogger(WebConfiguration.class);
 
