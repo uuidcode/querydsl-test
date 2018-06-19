@@ -25,12 +25,17 @@ public class UserService2 extends QuerydslService<User, Long> {
         super(User.class, entityManager);
     }
 
+    public User findOneWithJoin(Long id) {
+        User user = this.findOne(id);
+        List<Book> bookList = this.bookService2.findAll(QBook.book.userId.eq(id));
+        return user.setBookList(bookList);
+    }
+
     public List<User> findAllWithJoin() {
         List<User> userList = this.findAll();
         List<Long> userIdList = userList.stream()
             .map(User::getUserId)
             .collect(toList());
-
 
         List<Book> bookList = this.bookService2.findAll(QBook.book.userId.in(userIdList));
         Map<Long, List<Book>> bookListMap = bookList.stream().collect(groupingBy(Book::getUserId));

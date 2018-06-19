@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.github.uuidcode.querydsl.test.CoreTest;
+import com.github.uuidcode.querydsl.test.entity.Book;
 import com.github.uuidcode.querydsl.test.entity.QUser;
 import com.github.uuidcode.querydsl.test.entity.User;
 import com.github.uuidcode.querydsl.test.util.CoreUtil;
@@ -17,6 +18,9 @@ public class UserService2Test extends CoreTest {
 
     @Autowired
     private UserService2 userService2;
+
+    @Autowired
+    private BookService2 bookService2;
 
     @Test
     public void findAll() {
@@ -46,7 +50,7 @@ public class UserService2Test extends CoreTest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void test() {
         User user = User.of().setUsername(CoreUtil.createUUID());
         this.userService2.save(user);
 
@@ -58,6 +62,16 @@ public class UserService2Test extends CoreTest {
 
         if (logger.isDebugEnabled()) {
             logger.debug(">>> test user: {}", CoreUtil.toJson(user.getClass().getName()));
+            logger.debug(">>> test user: {}", CoreUtil.toJson(user));
+        }
+
+        for (int i = 0; i < 3; i++) {
+            this.bookService2.save(Book.of().setUserId(user.getUserId()).setName(CoreUtil.createUUID()));
+        }
+
+        user = this.userService2.findOneWithJoin(user.getUserId());
+
+        if (logger.isDebugEnabled()) {
             logger.debug(">>> test user: {}", CoreUtil.toJson(user));
         }
     }
