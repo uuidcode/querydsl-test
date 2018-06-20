@@ -46,7 +46,8 @@ public class WebConfiguration implements WebMvcConfigurer{
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         if (logger.isDebugEnabled()) {
-            List<String> convertList = converters.stream().map(convert -> convert.getClass().getName())
+            List<String> convertList = converters.stream()
+                .map(convert -> convert.getClass().getName())
                 .collect(Collectors.toList());
 
             logger.debug(">>> configureMessageConverters converters: {}", CoreUtil.toJson(convertList));
