@@ -13,8 +13,10 @@ import com.github.uuidcode.querydsl.test.entity.Book;
 import com.github.uuidcode.querydsl.test.entity.Payload;
 import com.github.uuidcode.querydsl.test.entity.QBook;
 import com.github.uuidcode.querydsl.test.entity.User;
-import com.github.uuidcode.querydsl.test.util.CoreUtil;
 import com.querydsl.core.types.Predicate;
+
+import static com.github.uuidcode.querydsl.test.util.CoreUtil.fill;
+import static com.github.uuidcode.querydsl.test.util.CoreUtil.map;
 
 @Service
 public class UserService2 extends QuerydslService<User, Long> {
@@ -35,9 +37,9 @@ public class UserService2 extends QuerydslService<User, Long> {
     public Payload findAllWithJoin(Predicate predicate, Pageable pageable) {
         Page<User> userPage = this.findAll(predicate, pageable);
         List<User> userList = userPage.getContent();
-        List<Long> userIdList = CoreUtil.map(userList, User::getUserId);
+        List<Long> userIdList = map(userList, User::getUserId);
         List<Book> bookList = this.bookService2.findAll(QBook.book.userId.in(userIdList));
-        CoreUtil.fill(userList, bookList, Book::getUserId, User::setBookList);
+        fill(userList, bookList, Book::getUserId, User::setBookList);
         return Payload.of(userPage).setUserList(userList);
     }
 }
