@@ -2,6 +2,7 @@ package com.github.uuidcode.querydsl.test.configuration;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.github.jknack.handlebars.springmvc.HandlebarsViewResolver;
@@ -41,24 +43,26 @@ import com.github.uuidcode.querydsl.test.converter.GsonHttpMessageConverter;
 import com.github.uuidcode.querydsl.test.dao.UserDao;
 import com.github.uuidcode.querydsl.test.entity.EntityEntry;
 import com.github.uuidcode.querydsl.test.strategy.DefaultPhysicalNamingStrategy;
+import com.github.uuidcode.querydsl.test.util.CoreUtil;
 import com.p6spy.engine.spy.P6SpyDriver;
 
 @Configuration
-@EnableWebMvc
-@EnableSpringDataWebSupport
-@EnableTransactionManagement
-@EnableJpaRepositories(basePackageClasses = Application.class)
-@ComponentScan(basePackageClasses = Application.class)
 @MapperScan(basePackageClasses = UserDao.class)
-@EnableAspectJAutoProxy(proxyTargetClass = true)
-public class WebConfiguration extends WebMvcConfigurerAdapter {
+public class WebConfiguration implements WebMvcConfigurer{
     protected static Logger logger = LoggerFactory.getLogger(WebConfiguration.class);
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        if (logger.isDebugEnabled()) {
+            List<String> convertList = converters.stream().map(convert -> convert.getClass().getName())
+                .collect(Collectors.toList());
+
+            logger.debug(">>> configureMessageConverters converters: {}", CoreUtil.toJson(convertList));
+        }
+
+        converters.clear();
         GsonHttpMessageConverter gsonHttpMessageConverter = new GsonHttpMessageConverter();
         converters.add(gsonHttpMessageConverter);
-        super.configureMessageConverters(converters);
     }
 
     /**
@@ -68,13 +72,16 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         PageableHandlerMethodArgumentResolver resolver = new PageableHandlerMethodArgumentResolver();
         resolver.setOneIndexedParameters(true);
-        resolver.setFallbackPageable(new PageRequest(0, 10));
+        resolver.setFallbackPageable(PageRequest.of(0, 10));
         argumentResolvers.add(resolver);
-        super.addArgumentResolvers(argumentResolvers);
     }
 
     @Bean
     public DataSource dataSource() {
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> dataSource");
+        }
+
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setUrl("jdbc:p6spy:mysql://127.0.0.1:3306/querydsl?autoReconnect=true&useUnicode=true&characterEncoding=utf8&mysqlEncoding=utf8");
         dataSource.setUsername("root");

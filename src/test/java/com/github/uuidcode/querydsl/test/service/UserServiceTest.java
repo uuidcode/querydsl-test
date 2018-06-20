@@ -1,18 +1,22 @@
 package com.github.uuidcode.querydsl.test.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.querydsl.QPageRequest;
+import org.springframework.data.querydsl.QSort;
 
 import com.github.uuidcode.querydsl.test.CoreTest;
 import com.github.uuidcode.querydsl.test.entity.Book;
+import com.github.uuidcode.querydsl.test.entity.Payload;
+import com.github.uuidcode.querydsl.test.entity.QUser;
 import com.github.uuidcode.querydsl.test.entity.User;
-import com.github.uuidcode.querydsl.test.entity.UserAuthority;
 import com.github.uuidcode.querydsl.test.util.CoreUtil;
+import com.querydsl.core.types.dsl.BooleanExpression;
 
 public class UserServiceTest extends CoreTest {
     protected static Logger logger = LoggerFactory.getLogger(UserServiceTest.class);
@@ -21,153 +25,104 @@ public class UserServiceTest extends CoreTest {
     private UserService userService;
 
     @Autowired
-    private UserAuthorityService userAuthorityService;
-
-    @Autowired
     private BookService bookService;
 
-    @Autowired
-    private ContentCountService contentCountService;
-
     @Test
-    public void get() {
-        User user = this.userService.get(1L);
+    public void findAll() {
+        List<User> userList = this.userService.findAll(QUser.user.userId.mod(2L).eq(0L));
 
         if (logger.isDebugEnabled()) {
-            logger.debug(">>> get user: {}", CoreUtil.toJson(user.getClass().getName()));
-        }
-
-        user.setUsername(CoreUtil.createUUID());
-        this.userService.update(user);
-    }
-
-    @Test
-    public void nullTest() {
-        User user = this.userService.get(null);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(">>> nullTest user: {}", CoreUtil.toJson(user));
+            logger.debug(">>> test userList: {}", CoreUtil.toJson(userList));
         }
     }
 
     @Test
-    public void notExistsTest() {
-        User user = this.userService.get(-1L);
+    public void findAllBySort() {
+        List<User> userList = this.userService.findAll(QUser.user.username.desc());
 
         if (logger.isDebugEnabled()) {
-            logger.debug(">>> notExistsTest user: {}", CoreUtil.toJson(user));
+            logger.debug(">>> test userList: {}", CoreUtil.toJson(userList));
         }
     }
 
     @Test
-    public void existsTest() {
-        User user = this.userService.get(14L);
+    public void test() {
+        User user = User.of().setUsername(CoreUtil.createUUID());
+        this.userService.save(user);
 
         if (logger.isDebugEnabled()) {
-            logger.debug(">>> existsTest user: {}", CoreUtil.toJson(user));
+            logger.debug(">>> test user: {}", CoreUtil.toJson(user));
+        }
+
+        user = this.userService.findOne(QUser.user.userId.eq(user.getUserId())).orElse(null);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> test user: {}", CoreUtil.toJson(user.getClass().getName()));
+            logger.debug(">>> test user: {}", CoreUtil.toJson(user));
+        }
+
+        for (int i = 0; i < 3; i++) {
+            Book book = Book.of().setUserId(user.getUserId()).setName(CoreUtil.createUUID());
+            this.bookService.save(book);
+        }
+
+        user = this.userService.findOneWithJoin(user.getUserId());
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> test user: {}", CoreUtil.toJson(user));
+        }
+    }
+
+    @Test
+    public void getTest() {
+        User user = this.userService.getOne(1L);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> getTest user: {}", CoreUtil.toJson(user));
+        }
+
+        Long userId = user.getUserId();
+
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>> getTest userId: {}", CoreUtil.toJson(userId));
+            logger.debug(">>> getTest user: {}", CoreUtil.toJson(user));
         }
     }
 
     @Test
     public void save() {
-        User user = this.userService.save(User.of().setUsername("CCC"));
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(">>> save user: {}", CoreUtil.toJson(user));
+        for (int i = 0; i < 100; i++) {
+            this.userService.save(User.of().setUsername(CoreUtil.createUUID()));
         }
     }
 
     @Test
-    public void remove() {
-        User user = this.userService.save(User.of().setUsername(CoreUtil.createUUID()));
-        this.userService.remove(user.getUserId());
+    public void sort() {
+        int pageNumber = 1;
+        QPageRequest pageable = new QPageRequest(pageNumber - 1, 10, new QSort(QUser.user.username.desc()));
+        BooleanExpression predicate = QUser.user.userId.mod(2L).eq(0L);
+
+        Page<User> page= this.userService.findAll(predicate, pageable);
+
+        Payload payload = Payload.of()
+            .paging(page.getNumber() + 1, 10L, 10L, page.getTotalElements())
+            .setUserList(page.getContent());
+
 
         if (logger.isDebugEnabled()) {
-            logger.debug(">>> remove user: {}", CoreUtil.toJson(user));
+            logger.debug(">>> sort payload: {}", CoreUtil.toJson(payload));
         }
     }
 
     @Test
-    public void update() {
-        User user = User.of();
-        this.userService.save(user);
+    public void payload() {
+        int pageNumber = 1;
+        QPageRequest pageable = new QPageRequest(pageNumber - 1, 10, new QSort(QUser.user.userId.asc()));
+
+        Payload payload = this.userService.findAllWithJoin(null, pageable);
 
         if (logger.isDebugEnabled()) {
-            logger.debug(">>> update user: {}", CoreUtil.toJson(user));
+            logger.debug(">>> payload payload: {}", CoreUtil.toJson(payload));
         }
-
-        this.userService.update(user.setUsername(CoreUtil.createUUID()));
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(">>> update user: {}", CoreUtil.toJson(user));
-        }
-    }
-
-    @Test
-    public void update2() {
-        User user = this.userService.get(26L);
-        user.setUsername(String.valueOf(System.currentTimeMillis()));
-        this.userService.update(user);
-    }
-
-    @Test
-    public void list() {
-        List<User> list = this.userService.list();
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(">>> list list: {}", CoreUtil.toJson(list.getClass().getName()));
-        }
-
-        CoreUtil.printJson(logger, list);
-    }
-
-    @Test
-    public void join() {
-        List<User> list = this.userService.list();
-        this.userAuthorityService.join(list);
-        this.bookService.join(list);
-        CoreUtil.printJson(logger, list);
-    }
-
-    @Test
-    public void manualJoin() {
-        List<User> list = this.userService.list();
-        this.userAuthorityService.manualJoin(list);
-        this.bookService.manualJoin(list);
-        this.contentCountService.manualJoin(list);
-        CoreUtil.printJson(logger, list);
-    }
-
-    @Test
-    public void join2() {
-        List<User> userList = this.userService.list()
-            .stream()
-            .map(user -> {
-                List<UserAuthority> userAuthorityList = this.userAuthorityService.list(user.getUserId());
-                user.setUserAuthorityList(userAuthorityList);
-
-                List<Book> bookList = this.bookService.list(user.getUserId());
-                user.setBookList(bookList);
-                return user;
-            })
-            .collect(Collectors.toList());
-
-        if (logger.isDebugEnabled()) {
-            logger.debug(">>> join2 userList: {}", CoreUtil.toJson(userList));
-        }
-    }
-
-    @Test
-    public void list2() {
-        List<User> userList = this.userService.list2();
-        CoreUtil.printJson(logger, userList);
-    }
-
-    @Test
-    public void saveAndRemove() {
-        User user = User.of().setUsername(CoreUtil.createUUID());
-
-        this.userService.save(user);
-        this.userService.remove(user);
     }
 }

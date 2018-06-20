@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.github.uuidcode.querydsl.test.entity.Payload;
 import com.github.uuidcode.querydsl.test.entity.User;
-import com.github.uuidcode.querydsl.test.service.UserService2;
+import com.github.uuidcode.querydsl.test.service.UserService;
 import com.querydsl.core.types.Predicate;
 
 @Controller
 public class UserController {
     @Autowired
-    private UserService2 userService2;
+    private UserService userService;
 
     @RequestMapping("/user")
     @ResponseBody
     public Payload list(@QuerydslPredicate(root = User.class) Predicate predicate, Pageable pageable) {
-        return this.userService2.findAllWithJoin(predicate, pageable);
+        return this.userService.findAllWithJoin(predicate, pageable);
     }
 }

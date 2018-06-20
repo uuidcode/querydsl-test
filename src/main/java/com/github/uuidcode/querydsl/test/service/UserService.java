@@ -2,26 +2,45 @@ package com.github.uuidcode.querydsl.test.service;
 
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.github.uuidcode.querydsl.test.dao.UserDao;
+import com.github.uuidcode.querydsl.test.entity.Book;
+import com.github.uuidcode.querydsl.test.entity.Payload;
+import com.github.uuidcode.querydsl.test.entity.QBook;
 import com.github.uuidcode.querydsl.test.entity.QUser;
 import com.github.uuidcode.querydsl.test.entity.User;
+import com.querydsl.core.types.Predicate;
+
+import static com.github.uuidcode.querydsl.test.util.CoreUtil.fill;
+import static com.github.uuidcode.querydsl.test.util.CoreUtil.map;
 
 @Service
-public class UserService extends EntityService<User> {
+public class UserService extends QuerydslService<User, Long> {
     @Autowired
-    private UserDao userDao;
+    private BookService bookService2;
 
-    public List<User> list() {
-        return this.createQuery()
-        .select(QUser.user)
-        .from(QUser.user)
-        .fetch();
+    @Autowired
+    public UserService(EntityManager entityManager) {
+        super(User.class, entityManager);
     }
 
-    public List<User> list2() {
-        return this.userDao.list2();
+    public User findOneWithJoin(Long id) {
+        User user = this.findOne(QUser.user.userId.eq(id)).orElse(null);
+        List<Book> bookList = this.bookService2.findAll(QBook.book.userId.eq(id));
+        return user.setBookList(bookList);
+    }
+
+    public Payload findAllWithJoin(Predicate predicate, Pageable pageable) {
+        Page<User> userPage = this.findAll(predicate, pageable);
+        List<User> userList = userPage.getContent();
+        List<Long> userIdList = map(userList, User::getUserId);
+        List<Book> bookList = this.bookService2.findAll(QBook.book.userId.in(userIdList));
+        fill(userList, bookList, Book::getUserId, User::setBookList);
+        return Payload.of(userPage).setUserList(userList);
     }
 }
