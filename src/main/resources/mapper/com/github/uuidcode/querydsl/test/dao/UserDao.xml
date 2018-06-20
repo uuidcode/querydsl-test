@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.github.uuidcode.querydsl.test.dao.UserDao">
-    <select id="list2" resultType="com.github.uuidcode.querydsl.test.entity.User">
+    <select id="list" resultType="com.github.uuidcode.querydsl.test.entity.User">
         select * from user
         where 1 = 1
     </select>

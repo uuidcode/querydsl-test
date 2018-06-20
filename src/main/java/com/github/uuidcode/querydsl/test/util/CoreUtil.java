@@ -218,7 +218,6 @@ public class CoreUtil {
             .registerTypeAdapter(String.class, StringTypeAdapter)
             .registerTypeAdapter(Class.class, ClassTypeAdapter)
             .registerTypeAdapter(Date.class, DateTypeAdapter)
-            .registerTypeAdapter(PageImpl.class, new PageDeserializer(PageImpl.class))
             .disableHtmlEscaping()
             .setPrettyPrinting()
             .addSerializationExclusionStrategy(new ExclusionStrategy() {

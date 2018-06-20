@@ -8,5 +8,5 @@ import com.github.uuidcode.querydsl.test.entity.User;
 
 @Repository
 public interface UserDao {
-    List<User> list2();
+    List<User> list();
 }
