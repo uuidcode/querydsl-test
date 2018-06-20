@@ -1,7 +1,6 @@
 package com.github.uuidcode.querydsl.test.service;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 
@@ -16,9 +15,6 @@ import com.github.uuidcode.querydsl.test.entity.QBook;
 import com.github.uuidcode.querydsl.test.entity.User;
 import com.github.uuidcode.querydsl.test.util.CoreUtil;
 import com.querydsl.core.types.Predicate;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class UserService2 extends QuerydslService<User, Long> {
