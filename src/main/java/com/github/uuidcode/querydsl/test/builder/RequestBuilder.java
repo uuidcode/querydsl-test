@@ -290,10 +290,9 @@ public class RequestBuilder {
 
     public void executeAndDownload(File file) {
         try {
-            HttpEntity entity =
-                this.execute()
-                    .returnResponse()
-                    .getEntity();
+            HttpEntity entity = this.execute()
+                .returnResponse()
+                .getEntity();
 
             if (entity != null) {
                 InputStream in = entity.getContent();
@@ -319,9 +318,11 @@ public class RequestBuilder {
 
     private <T> T executeAndGetObject(Class<T> tClass, Type typeofT) {
         try {
-            T object = GsonHttpMessageConverter
-                .getDefaultGsonBuilder()
-                .setFieldNamingPolicy(ofNullable(this.resultFieldNamePolicy).orElse(this.fieldNamePolicy))
+            FieldNamingPolicy fieldNamingPolicy = ofNullable(this.resultFieldNamePolicy)
+                .orElse(this.fieldNamePolicy);
+
+            T object = GsonHttpMessageConverter.createGsonBuilder()
+                .setFieldNamingPolicy(fieldNamingPolicy)
                 .create()
                 .fromJson(this.executeAndGetContent(), tClass != null ? tClass : typeofT );
 

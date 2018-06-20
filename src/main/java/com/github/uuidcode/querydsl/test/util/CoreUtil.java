@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageImpl;
 
 import com.github.uuidcode.querydsl.test.configuration.BinderConfiguration;
+import com.github.uuidcode.querydsl.test.converter.GsonHttpMessageConverter;
 import com.github.uuidcode.querydsl.test.entity.Book;
 import com.google.common.base.CaseFormat;
 import com.google.gson.ExclusionStrategy;
@@ -55,125 +56,6 @@ import javassist.util.proxy.MethodHandler;
 
 public class CoreUtil {
     protected static Logger logger = LoggerFactory.getLogger(CoreUtil.class);
-
-    private static TypeAdapter<Long> LongTypeAdapter = new TypeAdapter<Long>() {
-        @Override
-        public void write(JsonWriter out, Long value) throws IOException {
-            out.value(value);
-        }
-
-        @Override
-        public Long read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
-            }
-
-            try {
-                String result = in.nextString();
-
-                try {
-                    if (result.contains("E")) {
-                        return new BigDecimal(result).longValue();
-                    }
-
-                    return Long.parseLong(result.replaceAll("\\,", "").trim(), 10);
-                } catch (Exception e) {
-                    return null;
-                }
-            } catch (NumberFormatException e) {
-                throw new JsonSyntaxException(e);
-            }
-        }
-    };
-
-    @SuppressWarnings({"rawtypes" })
-    private static TypeAdapter<Class> ClassTypeAdapter = new TypeAdapter<Class>() {
-        @Override
-        public void write(JsonWriter out, Class value) throws IOException {
-            out.value(value.getName());
-        }
-
-        @Override
-        public Class read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
-            }
-            try {
-                String result = in.nextString();
-                try {
-                    return Class.forName(result);
-                } catch (Exception e) {
-                    return null;
-                }
-            } catch (NumberFormatException e) {
-                throw new JsonSyntaxException(e);
-            }
-        }
-    };
-
-    private static TypeAdapter<Date> DateTypeAdapter = new TypeAdapter<Date>() {
-        @Override
-        public void write(JsonWriter out, Date value) throws IOException {
-            String date = null;
-            try {
-                FastDateFormat format = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
-                date = format.format(value);
-            } catch (Exception e) {
-            }
-            out.value(date);
-        }
-
-        @Override
-        public Date read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
-            }
-
-            String result = in.nextString();
-            try {
-                FastDateFormat format = FastDateFormat.getInstance("yyyy-MM-dd HH:mm:ss");
-                return format.parse(result.trim());
-            } catch (Exception e) {
-                try {
-                    FastDateFormat format = FastDateFormat.getInstance("yyyy-MM-dd");
-                    return format.parse(result.trim());
-                } catch (Exception ex) {
-                }
-            }
-
-            return null;
-        }
-    };
-
-    private static TypeAdapter<String> StringTypeAdapter = new TypeAdapter<String>() {
-        @Override
-        public void write(JsonWriter out, String value) throws IOException {
-            out.value(value);
-        }
-
-        @Override
-        public String read(JsonReader in) throws IOException {
-            if (in.peek() == JsonToken.NULL) {
-                in.nextNull();
-                return null;
-            }
-
-            try {
-                String result = in.nextString();
-
-                if (result == null || result.trim().length() == 0) {
-                    return null;
-                }
-
-                return result.trim();
-            } catch (NumberFormatException e) {
-                throw new JsonSyntaxException(e);
-            }
-        }
-    };
 
     private static DateTimeParser[] dateTimeParsers = {
         DateTimeFormat.forPattern("yyyyMMdd").getParser(),
@@ -211,38 +93,6 @@ public class CoreUtil {
     public static Date parseDateTime(String text) {
         return dateTimeFormatter.parseDateTime(text).toDate();
     }
-
-    private static Gson gson = new GsonBuilder()
-            .registerTypeAdapter(long.class, LongTypeAdapter)
-            .registerTypeAdapter(Long.class, LongTypeAdapter)
-            .registerTypeAdapter(String.class, StringTypeAdapter)
-            .registerTypeAdapter(Class.class, ClassTypeAdapter)
-            .registerTypeAdapter(Date.class, DateTypeAdapter)
-            .disableHtmlEscaping()
-            .setPrettyPrinting()
-            .addSerializationExclusionStrategy(new ExclusionStrategy() {
-                Set<Class> excludedClassSet = new HashSet() {{
-                    this.add(Class.class);
-                    this.add(MethodHandler.class);
-                }};
-
-                @Override
-                public boolean shouldSkipField(FieldAttributes fieldAttributes) {
-                    Class<?> declaredClass = fieldAttributes.getDeclaredClass();
-
-                    if (excludedClassSet.contains(declaredClass)) {
-                        return true;
-                    }
-
-                    return false;
-                }
-
-                @Override
-                public boolean shouldSkipClass(Class<?> aClass) {
-                    return false;
-                }
-            })
-            .create();
 
     public static boolean isEmpty(String value) {
         return value == null || value.trim().length() == 0;
@@ -352,11 +202,11 @@ public class CoreUtil {
     }
 
     public static <T> T fromJson(String json, Class<T> clazz) {
-        return gson.fromJson(json, clazz);
+        return GsonHttpMessageConverter.gson.fromJson(json, clazz);
     }
 
     public static String toJson(Object object) {
-        return gson.toJson(object);
+        return GsonHttpMessageConverter.gson.toJson(object);
     }
 
     public static <T> List<T> asList(T... array) {
