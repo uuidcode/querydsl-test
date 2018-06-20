@@ -13,7 +13,7 @@ public class Payload extends CoreObject<Payload> {
     }
 
     public static Payload of(Page page) {
-        return new Payload().paging(page.getNumber(), page.getTotalElements());
+        return new Payload().paging(page.getNumber() + 1, page.getTotalElements());
     }
 
     public List<User> getUserList() {
