@@ -32,6 +32,13 @@ public class UserService extends QuerydslService<User, Long> {
         super(User.class, entityManager);
     }
 
+    @Cacheable(cacheNames = Cache.USER)
+    public Payload findOne(Long userId) {
+        User user = this.findOne(QUser.user.userId.eq(userId))
+            .orElse(null);
+        return Payload.of().setUser(user);
+    }
+
     public User findOneWithJoin(Long id) {
         User user = this.findOne(QUser.user.userId.eq(id)).orElse(null);
         List<Book> bookList = this.bookService.findAll(QBook.book.userId.eq(id));

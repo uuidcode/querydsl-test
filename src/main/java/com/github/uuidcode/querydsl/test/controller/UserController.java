@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.uuidcode.querydsl.test.entity.Payload;
@@ -15,6 +16,11 @@ import com.querydsl.core.types.Predicate;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @GetMapping("/user/{userId}")
+    public Payload list(@PathVariable("userId") Long userId) {
+        return this.userService.findOne(userId);
+    }
 
     @GetMapping("/user")
     public Payload list(@QuerydslPredicate(root = User.class) Predicate predicate, Pageable pageable) {
