@@ -24,6 +24,9 @@ public class JsonSerializer<T> implements SerializationPair<Payload> {
 
     @Override
     public RedisElementWriter<Payload> getWriter() {
-        return payload -> ByteBuffer.wrap(CoreUtil.toJson(payload).getBytes());
+        return payload -> {
+            String json = CoreUtil.toJson(payload);
+            return ByteBuffer.wrap(json.getBytes());
+        };
     }
 }

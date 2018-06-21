@@ -1,5 +1,6 @@
 package com.github.uuidcode.querydsl.test.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
@@ -11,6 +12,9 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericToStringSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.github.uuidcode.querydsl.test.generator.JSonCacheKeyGenerator;
 import com.github.uuidcode.querydsl.test.serializer.JsonSerializer;
@@ -20,14 +24,12 @@ import static org.springframework.data.redis.cache.RedisCacheConfiguration.defau
 @EnableCaching
 @Configuration
 public class CacheConfiguration extends JCacheConfigurerSupport {
+    @Autowired
+    private RedisConnectionFactory redisConnectionFactory;
+
     @Override
     public KeyGenerator keyGenerator() {
         return new JSonCacheKeyGenerator();
-    }
-
-    @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        return new JedisConnectionFactory(new RedisStandaloneConfiguration("10.198.20.108"));
     }
 
     @Bean
@@ -37,7 +39,7 @@ public class CacheConfiguration extends JCacheConfigurerSupport {
         RedisCacheConfiguration cacheConfiguration = defaultCacheConfig()
             .serializeValuesWith(jsonSerializer);
 
-        return RedisCacheManager.builder(this.redisConnectionFactory())
+        return RedisCacheManager.builder(this.redisConnectionFactory)
             .cacheDefaults(cacheConfiguration)
             .build();
     }

@@ -5,6 +5,8 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.uuidcode.querydsl.test.Application;
+import com.github.uuidcode.querydsl.test.logger.DefaultSlf4JLogger;
 import com.github.uuidcode.querydsl.test.util.CoreUtil;
 import com.github.uuidcode.querydsl.test.util.StringStream;
 import com.github.uuidcode.querydsl.test.listener.DefaultLoggingEventListener;
@@ -41,7 +43,8 @@ public class DefaultMessageFormattingStrategy implements MessageFormattingStrate
         StackTraceElement[] stackTraceElementArray = exception.getStackTrace();
 
         return Arrays.stream(stackTraceElementArray)
-            .filter(s -> s.getClassName().startsWith("com.github.querydsl"))
+            .filter(s -> s.getClassName().startsWith(Application.class.getPackage().getName()))
+            .filter(s -> s.getClassName().endsWith("Service"))
             .findFirst()
             .orElse(null);
     }
@@ -56,12 +59,15 @@ public class DefaultMessageFormattingStrategy implements MessageFormattingStrate
         String methodName = stackTraceElement.getMethodName();
         int line = stackTraceElement.getLineNumber();
 
-        return StringStream.of().add(className)
+        return StringStream.of()
+            .add(">>>")
+            .addSpace()
+            .add(className)
             .add(".")
             .add(methodName)
             .add("(")
             .add(simpleClassName)
-            .add(".source")
+            .add(".java")
             .add(":")
             .add(line)
             .add(")")
