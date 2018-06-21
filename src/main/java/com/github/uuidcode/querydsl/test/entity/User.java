@@ -1,5 +1,6 @@
 package com.github.uuidcode.querydsl.test.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -15,7 +16,7 @@ import javax.persistence.Transient;
 import com.github.uuidcode.querydsl.test.entity.ContentCount.CountType;
 
 @Entity
-public class User {
+public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;

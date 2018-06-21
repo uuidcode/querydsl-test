@@ -14,11 +14,8 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.ehcache.EhCacheCacheManager;
-import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.data.domain.PageRequest;
@@ -143,23 +140,5 @@ public class WebConfiguration implements WebMvcConfigurer {
         SqlSessionFactory factory = factoryBean.getObject();
         factory.getConfiguration().setMapUnderscoreToCamelCase(true);
         return factory;
-    }
-
-    @Bean
-    public EhCacheManagerFactoryBean ehCacheManagerFactory() {
-        EhCacheManagerFactoryBean cacheManagerFactoryBean = new EhCacheManagerFactoryBean();
-        cacheManagerFactoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));
-        cacheManagerFactoryBean.setShared(false);
-
-        return cacheManagerFactoryBean;
-    }
-
-    @Bean
-    public EhCacheCacheManager ehCacheCacheManager() {
-        EhCacheCacheManager cacheManager = new EhCacheCacheManager();
-        cacheManager.setCacheManager(ehCacheManagerFactory().getObject());
-        cacheManager.setTransactionAware(false);
-
-        return cacheManager;
     }
 }

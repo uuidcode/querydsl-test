@@ -20,4 +20,10 @@ public class UserController {
     public Payload list(@QuerydslPredicate(root = User.class) Predicate predicate, Pageable pageable) {
         return this.userService.findAllWithJoin(predicate, pageable);
     }
+
+    @GetMapping("/user/evict")
+    public Payload flush() {
+        return this.userService.evict();
+    }
+
 }

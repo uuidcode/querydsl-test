@@ -5,12 +5,14 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.github.uuidcode.querydsl.test.entity.Book;
+import com.github.uuidcode.querydsl.test.entity.Cache;
 import com.github.uuidcode.querydsl.test.entity.Payload;
 import com.github.uuidcode.querydsl.test.entity.QBook;
 import com.github.uuidcode.querydsl.test.entity.QUser;
@@ -36,7 +38,7 @@ public class UserService extends QuerydslService<User, Long> {
         return user.setBookList(bookList);
     }
 
-    @Cacheable(cacheNames = "user")
+    @Cacheable(cacheNames = Cache.USER)
     public Payload findAllWithJoin(Predicate predicate, Pageable pageable) {
         Page<User> userPage = this.findAll(predicate, pageable);
         List<User> userList = userPage.getContent();
@@ -44,5 +46,10 @@ public class UserService extends QuerydslService<User, Long> {
         List<Book> bookList = this.bookService.findAll(QBook.book.userId.in(userIdList));
         fill(userList, bookList, Book::getUserId, User::setBookList);
         return Payload.of(userPage).setUserList(userList);
+    }
+
+    @CacheEvict(cacheNames = Cache.USER, allEntries = true)
+    public Payload evict() {
+        return Payload.of();
     }
 }

@@ -185,7 +185,15 @@ public class CoreUtil {
     }
 
     public static <T> T fromJson(String json, Class<T> clazz) {
-        return GsonHttpMessageConverter.gson.fromJson(json, clazz);
+        try {
+            return GsonHttpMessageConverter.gson.fromJson(json, clazz);
+        } catch (Throwable t) {
+            if (logger.isErrorEnabled()) {
+                logger.error(">>> error fromJson json {} ", json);
+            }
+
+            throw t;
+        }
     }
 
     public static String toJson(Object object) {
