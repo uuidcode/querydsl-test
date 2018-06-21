@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ import static com.github.uuidcode.querydsl.test.util.CoreUtil.map;
 @Service
 public class UserService extends QuerydslService<User, Long> {
     @Autowired
-    private BookService bookService2;
+    private BookService bookService;
 
     @Autowired
     public UserService(EntityManager entityManager) {
@@ -31,15 +32,16 @@ public class UserService extends QuerydslService<User, Long> {
 
     public User findOneWithJoin(Long id) {
         User user = this.findOne(QUser.user.userId.eq(id)).orElse(null);
-        List<Book> bookList = this.bookService2.findAll(QBook.book.userId.eq(id));
+        List<Book> bookList = this.bookService.findAll(QBook.book.userId.eq(id));
         return user.setBookList(bookList);
     }
 
+    @Cacheable(cacheNames = "user")
     public Payload findAllWithJoin(Predicate predicate, Pageable pageable) {
         Page<User> userPage = this.findAll(predicate, pageable);
         List<User> userList = userPage.getContent();
         List<Long> userIdList = map(userList, User::getUserId);
-        List<Book> bookList = this.bookService2.findAll(QBook.book.userId.in(userIdList));
+        List<Book> bookList = this.bookService.findAll(QBook.book.userId.in(userIdList));
         fill(userList, bookList, Book::getUserId, User::setBookList);
         return Payload.of(userPage).setUserList(userList);
     }

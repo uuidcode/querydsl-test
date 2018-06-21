@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformationSuppo
 import org.springframework.data.jpa.repository.support.QuerydslJpaRepository;
 
 public class QuerydslService<T, ID extends Serializable> extends QuerydslJpaRepository<T, ID> {
-    public QuerydslService(Class<T> domainClass, EntityManager entityManager) {
-        super((JpaEntityInformation<T, ID>) JpaEntityInformationSupport.getEntityInformation(domainClass, entityManager),
+    public QuerydslService(Class<T> entityClass, EntityManager entityManager) {
+        super((JpaEntityInformation<T, ID>) JpaEntityInformationSupport.getEntityInformation(entityClass, entityManager),
             entityManager);
     }
 }

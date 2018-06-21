@@ -11,4 +11,9 @@
         <priority value="DEBUG"/>
         <appender-ref ref="console"/>
     </root>
+
+    <category name="net.sf.ehcache">
+        <priority value="ALL"/>
+        <appender-ref ref="console"/>
+    </category>
 </log4j:configuration>
