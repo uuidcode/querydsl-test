@@ -10,8 +10,8 @@ import com.github.uuidcode.querydsl.test.entity.Payload;
 import com.github.uuidcode.querydsl.test.util.CoreUtil;
 
 public class JsonSerializer<T> implements SerializationPair<Payload> {
-    public static JsonSerializer of() {
-        return new JsonSerializer();
+    public static JsonSerializer<Payload> of() {
+        return new JsonSerializer<>();
     }
 
     @Override
