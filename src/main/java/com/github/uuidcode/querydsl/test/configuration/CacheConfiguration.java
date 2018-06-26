@@ -1,6 +1,6 @@
 package com.github.uuidcode.querydsl.test.configuration;
 
-import static org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig;
+import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -14,6 +14,8 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 import com.github.uuidcode.querydsl.test.serializer.JsonSerializer;
 
+import static org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig;
+
 @EnableCaching
 @Configuration
 public class CacheConfiguration extends JCacheConfigurerSupport {
@@ -25,7 +27,8 @@ public class CacheConfiguration extends JCacheConfigurerSupport {
         JsonSerializer jsonSerializer = new JsonSerializer();
 
         RedisCacheConfiguration cacheConfiguration = defaultCacheConfig()
-            .serializeValuesWith(jsonSerializer);
+            .serializeValuesWith(jsonSerializer)
+            .entryTtl(Duration.ofMinutes(20));
 
         return RedisCacheManager.builder(this.redisConnectionFactory)
             .cacheDefaults(cacheConfiguration)
