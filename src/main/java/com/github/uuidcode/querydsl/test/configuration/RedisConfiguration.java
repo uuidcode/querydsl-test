@@ -1,7 +1,5 @@
 package com.github.uuidcode.querydsl.test.configuration;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.jcache.config.JCacheConfigurerSupport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -15,7 +13,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfiguration {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration standaloneConfig = new RedisStandaloneConfiguration("10.198.20.108");
+        RedisStandaloneConfiguration standaloneConfig =
+            new RedisStandaloneConfiguration("10.198.20.108");
         return new JedisConnectionFactory(standaloneConfig);
     }
 
