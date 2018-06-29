@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.uuidcode.querydsl.test.Application;
-import com.github.uuidcode.querydsl.test.logger.DefaultSlf4JLogger;
 import com.github.uuidcode.querydsl.test.util.CoreUtil;
 import com.github.uuidcode.querydsl.test.util.StringStream;
 import com.github.uuidcode.querydsl.test.listener.DefaultLoggingEventListener;
