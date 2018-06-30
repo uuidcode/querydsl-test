@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -19,6 +20,21 @@ public class Post {
     private String text;
     private String category;
     private Long authorId;
+    @Transient
+    private Author author;
+
+    public Author getAuthor() {
+        return this.author;
+    }
+
+    public Post setAuthor(Author author) {
+        this.author = author;
+        return this;
+    }
+
+    public static Post of() {
+        return new Post();
+    }
 
     public Long getAuthorId() {
         return this.authorId;

@@ -23,6 +23,10 @@ public class Author {
     @Transient
     private List<Post> postList;
 
+    public static Author of() {
+        return new Author();
+    }
+
     public List<Post> getPostList() {
         return this.postList;
     }
