@@ -10,7 +10,7 @@ type Author {
     id: ID!
     name: String!
     thumbnail: String
-    postList: [Post]!
+    postList: [Post]
 }
 
 type Query {
