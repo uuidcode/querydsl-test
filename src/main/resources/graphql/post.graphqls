@@ -6,8 +6,10 @@ type Post {
     author: Author!
 }
 
+# 창작자
 type Author {
     id: ID!
+    #이름
     name: String!
     thumbnail: String
     postList: [Post]
