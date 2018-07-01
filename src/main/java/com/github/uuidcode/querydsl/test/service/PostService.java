@@ -28,7 +28,8 @@ public class PostService extends QuerydslService<Post, Long> {
     }
 
     @GraphQLQuery(name = "getRecentPosts")
-    public List<Post> getRecentPosts(int count, int offset) {
+    public List<Post> getRecentPosts(@GraphQLArgument(name = "count") int count,
+                                     @GraphQLArgument(name = "offset") int offset) {
         Page<Post> page = this.findAll(new QPageRequest(offset, count));
         return page.getContent();
     }
