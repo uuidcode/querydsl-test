@@ -10,15 +10,22 @@ import org.hibernate.annotations.GenericGenerator;
 
 import static com.github.uuidcode.querydsl.test.entity.EntityEntry.GENERATOR_NAME;
 
+import io.leangen.graphql.annotations.GraphQLQuery;
+
 @Entity
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = GENERATOR_NAME)
     @GenericGenerator(name = GENERATOR_NAME, strategy = GENERATOR_NAME)
-    private Long id;
+    @GraphQLQuery(name= "postId")
+    private Long postId;
+    @GraphQLQuery(name= "title")
     private String title;
+    @GraphQLQuery(name= "text")
     private String text;
+    @GraphQLQuery(name= "category")
     private String category;
+    @GraphQLQuery(name= "authorId")
     private Long authorId;
     @Transient
     private Author author;
@@ -68,12 +75,12 @@ public class Post {
         this.title = title;
         return this;
     }
-    public Long getId() {
-        return this.id;
+    public Long getPostId() {
+        return this.postId;
     }
 
-    public Post setId(Long id) {
-        this.id = id;
+    public Post setPostId(Long postId) {
+        this.postId = postId;
         return this;
     }
 }

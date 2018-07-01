@@ -13,6 +13,7 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.github.jknack.handlebars.springmvc.HandlebarsViewResolver;
@@ -62,5 +63,11 @@ public class WebConfiguration implements WebMvcConfigurer {
         handlebarsViewResolver.setSuffix(".hbs");
         handlebarsViewResolver.setCache(false);
         return handlebarsViewResolver;
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/graphiql")
+            .setViewName("forward:/graphiql/index.html");
     }
 }

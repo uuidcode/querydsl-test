@@ -19,7 +19,7 @@ public class QAuthor extends EntityPathBase<Author> {
 
     public static final QAuthor author = new QAuthor("author");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final NumberPath<Long> authorId = createNumber("authorId", Long.class);
 
     public final StringPath name = createString("name");
 

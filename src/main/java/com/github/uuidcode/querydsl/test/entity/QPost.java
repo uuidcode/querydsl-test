@@ -23,7 +23,7 @@ public class QPost extends EntityPathBase<Post> {
 
     public final StringPath category = createString("category");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final NumberPath<Long> postId = createNumber("postId", Long.class);
 
     public final StringPath text = createString("text");
 
