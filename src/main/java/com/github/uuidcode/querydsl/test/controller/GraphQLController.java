@@ -17,7 +17,10 @@ import com.github.uuidcode.querydsl.test.service.PostService;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.Scalars;
+import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.PropertyDataFetcher;
 import io.leangen.graphql.GraphQLSchemaGenerator;
 import io.leangen.graphql.metadata.strategy.query.AnnotatedResolverBuilder;
 import io.leangen.graphql.metadata.strategy.value.jackson.JacksonValueMapperFactory;
@@ -28,6 +31,12 @@ public class GraphQLController {
 
     public GraphQLController(AuthorService authorService,
                              PostService postService) {
+        GraphQLFieldDefinition descriptionField = GraphQLFieldDefinition.newFieldDefinition()
+            .name("description")
+            .type(Scalars.GraphQLString)
+            .dataFetcher(PropertyDataFetcher.fetching("desc"))
+            .build();
+
         GraphQLSchema schema = new GraphQLSchemaGenerator()
             .withResolverBuilders(new AnnotatedResolverBuilder())
             .withOperationsFromType(Service.class)

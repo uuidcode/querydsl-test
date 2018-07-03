@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.github.uuidcode.querydsl.test.entity.Author;
 import com.github.uuidcode.querydsl.test.entity.Post;
+import com.github.uuidcode.querydsl.test.util.WebContext;
 
 import io.leangen.graphql.annotations.GraphQLArgument;
 import io.leangen.graphql.annotations.GraphQLMutation;
@@ -28,9 +29,11 @@ public class AuthorService extends QuerydslService<Author, Long> {
     public List<Author> findAllAuthor() {
         List<Author> authorList = this.findAll();
 
-        authorList.forEach(author -> {
-            List<Post> postList = this.postService.findByAuthorId(author.getAuthorId());
-            author.setPostList(postList);
+        WebContext.set(() -> {
+            authorList.forEach(author -> {
+                List<Post> postList = this.postService.findByAuthorId(author.getAuthorId());
+                author.setPostList(postList);
+            });
         });
 
         return authorList;

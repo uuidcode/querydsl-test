@@ -10,29 +10,45 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import static com.github.uuidcode.querydsl.test.entity.EntityEntry.GENERATOR_NAME;
+import com.github.uuidcode.querydsl.test.util.WebContext;
 
+import io.leangen.graphql.annotations.GraphQLIgnore;
 import io.leangen.graphql.annotations.GraphQLQuery;
+
+import static com.github.uuidcode.querydsl.test.entity.EntityEntry.GENERATOR_NAME;
 
 @Entity
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = GENERATOR_NAME)
     @GenericGenerator(name = GENERATOR_NAME, strategy = GENERATOR_NAME)
-    @GraphQLQuery(name = "authorId", description = "창작자 아이디")
     private Long authorId;
-    @GraphQLQuery(name= "name")
     private String name;
-    @GraphQLQuery(name= "thumbnail")
     private String thumbnail;
     @Transient
     private List<Post> postList;
+    @Transient
+    private String description;
+
+    @GraphQLIgnore
+    public String getDescription() {
+        return this.description;
+    }
+
+    public Author setDescription(String description) {
+        this.description = description;
+        return this;
+    }
 
     public static Author of() {
         return new Author();
     }
 
+    @GraphQLQuery(name= "postList")
     public List<Post> getPostList() {
+        WebContext.get()
+            .map(WebContext::getRunnable)
+            .ifPresent(Runnable::run);
         return this.postList;
     }
 
@@ -41,6 +57,7 @@ public class Author {
         return this;
     }
 
+    @GraphQLQuery(name= "thumbnail")
     public String getThumbnail() {
         return this.thumbnail;
     }
@@ -49,6 +66,8 @@ public class Author {
         this.thumbnail = thumbnail;
         return this;
     }
+
+    @GraphQLQuery(name= "name")
     public String getName() {
         return this.name;
     }
@@ -57,6 +76,8 @@ public class Author {
         this.name = name;
         return this;
     }
+
+    @GraphQLQuery(name = "authorId", description = "창작자 아이디")
     public Long getAuthorId() {
         return this.authorId;
     }
